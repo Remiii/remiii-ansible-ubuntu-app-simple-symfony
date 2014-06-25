@@ -1,0 +1,336 @@
+- hosts: all
+
+
+  ###
+  # Vars
+  ###
+  vars:
+    rootPath: '~/git/project'
+    hostname: 'django.server.remibarbe.fr'
+    publicIpAddress: '123.123.123.123'
+    user: 'django'
+    mySqlRootPwd: 'azerty'
+    mySqlUserPwd: 'azerty'
+    mySqlSamplePwd: 'azerty'
+    timezone: 'Europe/Paris'
+    ircServer: 'irc.freenode.org'
+    ircChannel: 'mychan'
+
+
+  ###
+  # Tasks
+  ###
+  tasks:
+
+
+    ###################
+    # Hostname
+    ###################
+    - name: Update hostname to {{ hostname }}
+      hostname: name={{ hostname }}
+      sudo: true
+
+
+    ###################
+    # Time management
+    ###################
+    - name: Install NTP (and update apt cache for the first install)
+      apt: name={{ item }} state=latest
+           update_cache=yes
+      with_items:
+        - ntp
+        - tzdata
+      sudo: true
+    - name: Set local timezone
+      copy: content={{ timezone }}
+            dest=/etc/timezone
+      notify: update tzdata
+      sudo: true
+    - name: Start the ntp service
+      service: name=ntp state=started enabled=true
+      sudo: true
+
+
+    ###
+    # MISC Tools
+    ###
+    - name: Install MISC tools
+      apt: name={{ item }} state=latest
+      with_items:
+        - language-pack-fr
+        - vim
+        - htop
+        - git-core
+        - curl
+        - acl
+        - htop
+        - tig
+        - tmux
+        - screen
+        - zsh
+        - ncdu
+        - ifstat
+      sudo: true
+
+
+    ###################
+    # User Management
+    ###################
+    - name: Create group {{ user }}
+      group: name={{ user }} state=present
+      sudo: true
+    - name: Create user {{ user }}
+      user: name={{ user }}
+            comment="{{ user }} user"
+            shell=/bin/zsh
+            groups=sudo,admin,{{ user }}
+      sudo: true
+
+
+    ###
+    # Security Tools
+    ###
+    - name: Install Security tools
+      apt: name={{ item }} state=latest
+      with_items:
+        - fail2ban
+      sudo: true
+    - name: Disable Root login (useless on Ubuntu but just in case ;-)
+      lineinfile: dest=/etc/ssh/sshd_config regexp='^PermitRootLogin' line='PermitRootLogin no' backup=yes
+      sudo: true
+    - name: Some security optim
+      lineinfile: dest=/etc/ssh/sshd_config line="Match User {{ user }}" backup=yes
+      sudo: true
+    - name: Some security optim
+      lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication yes" backup=yes
+      sudo: true
+    - name: Some security optim
+      lineinfile: dest=/etc/ssh/sshd_config line="Match User ubuntu" backup=yes
+      sudo: true
+    - name: Some security optim
+      lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
+      sudo: true
+    - name: Restart SSHd
+      service: name=ssh state=reloaded
+      sudo: true
+
+
+    ###
+    # Supervisor
+    ###
+    - name: Install Supervisor
+      apt: name=supervisor state=latest
+      sudo: true
+    - name: Start supervisor service
+      service: name=supervisor state=started enabled=true
+      sudo: true
+
+
+    ###
+    # Install Python+PIP
+    ###
+    - name: Install Python+PIP
+      apt: name={{ item }} state=latest
+      with_items:
+        - python
+        - python-pip
+      sudo: true
+
+
+    ###
+    # Install Ruby+Gem
+    ###
+    - name: Install Ruby
+      apt: name={{ item }} state=latest
+      with_items:
+        - ruby
+        - ruby-dev
+        - gem
+      sudo: true
+
+
+    ###
+    # Install Node+NPM
+    ###
+    - name: Install Node+NPM
+      apt: name={{ item }} state=latest
+      with_items:
+        - node
+        - npm
+      sudo: true
+
+
+    ###
+    # Install PHP
+    ###
+    - name: Install PHP
+      apt: name={{ item }} state=latest
+      with_items:
+        - php5
+        - php5-cli
+        - php5-dev
+        - php5-gd
+        - php5-curl
+        - php-apc
+      sudo: true
+
+
+    ###
+    # Install Apache
+    ###
+    - name: Install Apache
+      apt: name={{ item }} state=latest
+      with_items:
+        - apache2
+        - apache2-utils
+      sudo: true
+    - name: Update apache2 conf
+      lineinfile: dest=/etc/apache2/apache2.conf line="" backup=yes
+      sudo: true
+    - name: Update apache2 conf
+      lineinfile: dest=/etc/apache2/apache2.conf line="ServerTokens ProductOnly" backup=yes
+      sudo: true
+    - name: Update apache2 conf
+      lineinfile: dest=/etc/apache2/apache2.conf line="ServerSignature Off" backup=yes
+      sudo: true
+
+
+    ###
+    # Install mySQL
+    ###
+    - name: Install mySQL
+      apt: name={{ item }} state=latest
+      with_items:
+        - mysql-server
+        - php5-mysql
+        - python-mysqldb
+    #   - phpmyadmin
+      sudo: true
+    - name: Add remote connection
+      lineinfile: dest=/etc/mysql/my.cnf regexp='^bind-address' line='#bind-address = 127.0.0.1' backup=yes
+      sudo: true
+    - name: Update mysql root password for all root accounts
+      mysql_user: name=root password={{ mySqlRootPwd }} priv=*.*:ALL,GRANT state=present check_implicit_admin=yes login_user=root login_password={{ mySqlRootPwd }}
+      sudo: true
+    - name: Update mysql {{ user }} password for all accounts
+      mysql_user: name={{ user }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }}
+      sudo: true
+    - name : Create DB
+      mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
+      sudo: true
+    - name: Update mysql website-sample password
+      mysql_user: name=websitesample password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
+      sudo: true
+    - name: Restart mySQL
+      service: name=mysql state=restarted
+      sudo: true
+    #- name: Add sql-server config for PHPMyAdmin
+    #  copy: src={{ rootPath }}/skel/etc/apache2/sites-available/sql-server.conf dest=/etc/apache2/sites-available/sql-server.conf owner=root group=root backup=yes
+    #  sudo: true
+    #- name: Enable sql-server for PHPMyAdmin
+    #  shell: a2ensite sql-server
+    #  sudo: true
+
+
+    ###
+    # Install Postfix
+    ###
+    - name: Install mySQL
+      apt: name=postfix state=latest
+      sudo: true
+
+
+    ###
+    # Group Website
+    ###
+    - name: Create group website
+      group: name=website state=present
+      sudo: true
+
+
+    ###
+    # Install FTP ^^ (no prod EVT!!!)
+    ###
+    - name: Install proftpd
+      apt: name=proftpd state=latest
+      sudo: true
+    #- name: Create ftpgroup
+    #  group: name=ftpgroup-{{ user }} state=present
+    #  sudo: true
+    #- name: Create FTP user ftpuser-{{ user }}
+    #  user: name=ftpuser-{{ user }}
+    #        comment="ftpuser-{{ user }} user"
+    #        group={{ item }}
+    #  with_items:
+    #    - ftpgroup-{{ user }}
+    #  sudo: true
+    - name: Add proftpd conf
+      copy: src={{ rootPath }}/skel/etc/proftpd/proftpd.conf dest=/etc/proftpd/proftpd.conf owner=root group=root backup=yes
+      sudo: true
+    - name: Restart proFTPd
+      service: name=proftpd state=restarted
+      sudo: true
+
+
+    ###
+    # Copy skell home with rsync
+    ###
+    - name: Copy Skell home with rsync
+      synchronize: src={{ rootPath }}/skel/home/myuser/ dest=/home/{{ user }} perms=yes
+      sudo: true
+    - name: Clean rights for skell home
+      file: path=/home/{{ user }} owner={{ user }} group={{ user }} recurse=yes
+      sudo: true
+
+
+    ###
+    # Enable website-sample
+    ###
+    - name: Disable default
+      shell: a2dissite 000-default
+      sudo: true
+    - name: Add website-sample config
+      copy: src={{ rootPath }}/skel/etc/apache2/sites-available/website-sample.conf dest=/etc/apache2/sites-available/website-sample.conf owner=root group=root backup=yes
+      sudo: true
+    - name: Enable website-sample
+      shell: a2ensite website-sample
+      sudo: true
+
+
+    ###
+    # Apache2 config
+    ###
+    - name: Apache2 php config
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^memory_limit = 128M' line='memory_limit = 256M' backup=yes
+      sudo: true
+    - name: Apache2 module
+      apache2_module: state=present name={{ item }}
+      with_items:
+        - headers
+      sudo: true
+
+
+    ###
+    # Restart Service
+    ###
+    - name: Restart Apache
+      service: name=apache2 state=restarted
+      sudo: true
+    - name: Restart SSHd
+      service: name=ssh state=restarted
+      sudo: true
+    - name: Restart mySQL
+      service: name=mysql state=restarted
+      sudo: true
+    - name: Restart proFTPd
+      service: name=proftpd state=restarted
+      sudo: true
+
+
+    ###
+    # Alert
+    ###
+    #- name: Alert on IRC
+    #  irc: server={{ ircServer }} channel="#{{ ircChannel }}" msg="Ansible: deploy ubuntu simple Symfony App"
+
+
