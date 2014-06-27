@@ -1,4 +1,4 @@
-# Ansible config (Simple Symfony Application)
+# Ansible configuration<br>Simple Symfony Application
 
 This ansible config is just a sample, do not use in production!
 
