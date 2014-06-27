@@ -9,7 +9,7 @@
     #ServerName www.example.com
 
     ServerAdmin webmaster@localhost
-    DocumentRoot /home/django/documents/website/website-sample/web
+    DocumentRoot /home/{{ user }}/documents/website/website-sample/web
 
     # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
     # error, crit, alert, emerg.
@@ -27,7 +27,7 @@
     # after it has been globally disabled with "a2disconf".
     #Include conf-available/serve-cgi-bin.conf
 
-    <Directory /home/django/documents/website/website-sample/web>
+    <Directory /home/{{ user }}/documents/website/website-sample/web>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted

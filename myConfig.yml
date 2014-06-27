@@ -2,17 +2,26 @@
 
 
   ###
+  # TODO
+  ###
+  # Chiffrement du pwd User
+
+
+  ###
   # Vars
   ###
   vars:
     rootPath: '~/git/project'
-    hostname: 'django.server.remibarbe.fr'
+    hostname: 'django.server.mydomain.com'
     publicIpAddress: '123.123.123.123'
     user: 'django'
+    mySqlSampleUser: 'sqldjango'
+    userPwd: 'azerty'
     mySqlRootPwd: 'azerty'
     mySqlUserPwd: 'azerty'
     mySqlSamplePwd: 'azerty'
     timezone: 'Europe/Paris'
+    sysadminEmail: 'sysadmin@mydomain.com'
     ircServer: 'irc.freenode.org'
     ircChannel: 'mychan'
 
@@ -44,7 +53,6 @@
     - name: Set local timezone
       copy: content={{ timezone }}
             dest=/etc/timezone
-      notify: update tzdata
       sudo: true
     - name: Start the ntp service
       service: name=ntp state=started enabled=true
@@ -58,6 +66,11 @@
       apt: name={{ item }} state=latest
       with_items:
         - language-pack-fr
+        - dnsutils
+        - iftop
+        - smartmontools
+        - iptraf
+        - sysstat
         - vim
         - htop
         - git-core
@@ -73,9 +86,21 @@
       sudo: true
 
 
-    ###################
+    ###
     # User Management
-    ###################
+    ###
+    - name: Add /usr/local/scripts directory
+      file: path=/usr/local/scripts state=directory owner=root group=root
+      sudo: true
+    - name: Add login script
+      template: src={{ rootPath }}/skel/usr/local/scripts/loginNotification.sh.j2 dest=/usr/local/scripts/loginNotification.sh owner=root group=root
+      sudo: true
+    - name: Change shell for current user
+      shell: chsh -s /bin/zsh
+      sudo: true
+    - name: Create group sshuser
+      group: name=sshuser state=present
+      sudo: true
     - name: Create group {{ user }}
       group: name={{ user }} state=present
       sudo: true
@@ -83,7 +108,7 @@
       user: name={{ user }}
             comment="{{ user }} user"
             shell=/bin/zsh
-            groups=sudo,admin,{{ user }}
+            groups=sudo,admin,sshuser,{{ user }}
       sudo: true
 
 
@@ -219,7 +244,7 @@
       mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name: Update mysql website-sample password
-      mysql_user: name=websitesample password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
+      mysql_user: name={{ mySqlSampleUser }} password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
       sudo: true
     - name: Restart mySQL
       service: name=mysql state=restarted
@@ -265,7 +290,7 @@
     #    - ftpgroup-{{ user }}
     #  sudo: true
     - name: Add proftpd conf
-      copy: src={{ rootPath }}/skel/etc/proftpd/proftpd.conf dest=/etc/proftpd/proftpd.conf owner=root group=root backup=yes
+      template: src={{ rootPath }}/skel/etc/proftpd/proftpd.conf.j2 dest=/etc/proftpd/proftpd.conf owner=root group=root backup=yes
       sudo: true
     - name: Restart proFTPd
       service: name=proftpd state=restarted
@@ -290,7 +315,7 @@
       shell: a2dissite 000-default
       sudo: true
     - name: Add website-sample config
-      copy: src={{ rootPath }}/skel/etc/apache2/sites-available/website-sample.conf dest=/etc/apache2/sites-available/website-sample.conf owner=root group=root backup=yes
+      template: src={{ rootPath }}/skel/etc/apache2/sites-available/website-sample.conf.j2 dest=/etc/apache2/sites-available/website-sample.conf owner=root group=root backup=yes
       sudo: true
     - name: Enable website-sample
       shell: a2ensite website-sample
@@ -307,6 +332,7 @@
       apache2_module: state=present name={{ item }}
       with_items:
         - headers
+        - rewrite
       sudo: true
 
 

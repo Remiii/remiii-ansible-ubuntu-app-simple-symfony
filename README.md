@@ -1,6 +1,6 @@
 # remiii-ansible-ubuntu-app-simple-symfony
 
-This ansible config is just a sample, do not use in production.
+This ansible config is just a sample, do not use in production!
 
 ## Introduction
 
@@ -19,7 +19,7 @@ Mark: sample user `django`.
 
 ## Installation
 
-Install the following things:
+Install Ansible.
 
 ## Setup
 
@@ -44,4 +44,5 @@ MIT
 ## Author
 
 * Rémi Barbe (aka Remiii)
+
 

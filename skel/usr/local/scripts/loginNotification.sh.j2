@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Script /usr/local/scripts/loginNotification.sh
+# Rémi Barbe (aka Remiii) - the 2014/06/27
+
+# Send an email during the connexion
+
+DATE=`date "+%d.%m.%Y--%Hh%Mm"`
+IP=`echo $SSH_CONNECTION | awk '{print $1}'`
+REVERSE=`dig -x $IP +short`
+
+echo "Connexion de $USER sur $HOSTNAME
+---
+
+IP: $IP
+ReverseDNS: $REVERSE
+Date: $DATE
+Who: $(whoami)
+
+---
+
+Keyword: server, report, server report, serveur, connexion, ssh, $(whoami)
+
+" | mail -s "[ServerReport][$(hostname)]: Connexion de $USER sur $HOSTNAME" {{ sysadminEmail }}
+

@@ -186,11 +186,11 @@ AdminControlsEngine off
 # </Anonymous>
 
 <Limit LOGIN>
-    AllowUser django
+    AllowUser {{ user }}
     DenyAll
 </Limit>
 
-<Directory /home/django>
+<Directory /home/{{ user }}>
     AllowOverwrite on
 </Directory>
 
