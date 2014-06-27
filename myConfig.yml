@@ -108,7 +108,7 @@
       user: name={{ user }}
             comment="{{ user }} user"
             shell=/bin/zsh
-            groups=sudo,admin,sshuser,{{ user }}
+            groups=sudo,adm,sshuser,{{ user }}
       sudo: true
 
 
