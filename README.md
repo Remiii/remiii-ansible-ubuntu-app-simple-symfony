@@ -12,7 +12,7 @@ This ansible config is just a sample, do not use in production!
                \|                                                     |/       \|
 ```
 
-![Screen shot - Ansible](https://raw.github.com/Remiii/remiii-ansible-ubuntu-app-simple-symfony/_documentation/image/image1.png)<br />
+![Screen shot - Ansible](https://raw.githubusercontent.com/Remiii/remiii-ansible-ubuntu-app-simple-symfony/master/_documentation/image/image1.png)<br>
 Ansible.
 
 ## Introduction
