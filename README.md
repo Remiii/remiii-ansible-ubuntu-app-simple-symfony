@@ -61,7 +61,7 @@ That's it!
 
 ## License
 
-MIT
+Licensed under the MIT license (see LICENSE.md file)
 
 ## Author
 
