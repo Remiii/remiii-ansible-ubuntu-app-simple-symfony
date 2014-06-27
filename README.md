@@ -23,7 +23,7 @@ Install Ansible with your package manager (apt, brew...).
 
 ## Setup
 
-Setup the vars in myConfig.yml and add `ansible_inventory_machinename` file
+Setup the vars in `myConfig.yml` and add `ansible_inventory_machinename` file
 
 ```
 # ansible_inventory_machinename
