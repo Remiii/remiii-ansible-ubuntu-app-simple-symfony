@@ -300,8 +300,17 @@
     ###
     # Copy skell home with rsync
     ###
-    - name: Copy Skell home with rsync
-      synchronize: src={{ rootPath }}/skel/home/myuser/ dest=/home/{{ user }} perms=yes
+    - name: Add documents/website folder
+      file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
+      sudo: true
+    - name: Add README.md file
+      template: src={{ rootPath }}/skel/home/myuser/README.md.j2 dest=/home/{{ user }}/README.md
+      sudo: true
+    - name: Add Apache index file
+      template: src={{ rootPath }}/skel/home/myuser/documents/website/website-sample/web/index.php.j2 dest=/home/{{ user }}/documents/website/website-sample/web/index.php
+      sudo: true
+    - name: Add login script
+      template: src={{ rootPath }}/skel/usr/local/scripts/loginNotification.sh.j2 dest=/usr/local/scripts/loginNotification.sh owner=root group=root
       sudo: true
     - name: Clean rights for skell home
       file: path=/home/{{ user }} owner={{ user }} group={{ user }} recurse=yes
