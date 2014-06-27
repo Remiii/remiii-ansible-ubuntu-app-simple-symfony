@@ -3,14 +3,17 @@
 This ansible config is just a sample, do not use in production!
 
 ```
-                   ___,                 _    _       ___               _          
-                  /   |              o | |  | |     / (_)             | | o       
-  _  _  _        |    |   _  _    ,    | |  | |  _ |      __   _  _   | |     __, 
- / |/ |/ |  |   ||    |  / |/ |  / \_| |/ \_|/  |/ |     /  \_/ |/ |  |/  |  /  | 
+                   ___,                 _    _       ___               _
+                  /   |              o | |  | |     / (_)             | | o
+  _  _  _        |    |   _  _    ,    | |  | |  _ |      __   _  _   | |     __,
+ / |/ |/ |  |   ||    |  / |/ |  / \_| |/ \_|/  |/ |     /  \_/ |/ |  |/  |  /  |
    |  |  |_/ \_/|/\__/\_/  |  |_/ \/ |_/\_/ |__/|__/\___/\__/   |  |_/|__/|_/\_/|/
-               /|                                                     |\       /| 
-               \|                                                     |/       \| 
+               /|                                                     |\       /|
+               \|                                                     |/       \|
 ```
+
+![Screen shot - Ansible](https://raw.github.com/Remiii/remiii-ansible-ubuntu-app-simple-symfony/_documentation/image/image1.png)<br />
+Ansible.
 
 ## Introduction
 
