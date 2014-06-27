@@ -1,4 +1,4 @@
-# remiii-ansible-ubuntu-app-simple-symfony
+# Ansible config (Simple Symfony Application)
 
 This ansible config is just a sample, do not use in production!
 
