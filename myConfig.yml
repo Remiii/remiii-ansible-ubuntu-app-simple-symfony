@@ -2,18 +2,13 @@
 
 
   ###
-  # TODO
-  ###
-  # Chiffrement du pwd User
-
-
-  ###
   # Vars
   ###
   vars:
     rootPath: '~/git/project'
     hostname: 'django.server.mydomain.com'
     publicIpAddress: '123.123.123.123'
+    trustedIp: '127.0.0.1 192.168.1.10'
     user: 'django'
     mySqlSampleUser: 'sqldjango'
     userPwd: 'azerty'
@@ -35,8 +30,19 @@
     ###################
     # Hostname
     ###################
+    - name: Update Hosts file with hostname
+      lineinfile: dest=/etc/hosts line="{{ publicIpAddress }} {{ hostname }}" backup=yes
+      sudo: true
     - name: Update hostname to {{ hostname }}
       hostname: name={{ hostname }}
+      sudo: true
+
+
+    ###
+    # Update APT
+    ###
+    - name: Update APT
+      apt: update_cache=yes
       sudo: true
 
 
@@ -56,6 +62,14 @@
       sudo: true
     - name: Start the ntp service
       service: name=ntp state=started enabled=true
+      sudo: true
+
+
+    ###
+    # Add skel for all users
+    ###
+    - name: Add zshrc
+      template: src={{ rootPath }}/skel/etc/skel/.zshrc.j2 dest=/etc/skel/.zshrc owner=root group=root
       sudo: true
 
 
@@ -83,6 +97,8 @@
         - zsh
         - ncdu
         - ifstat
+        - build-essential
+        - imagemagick
       sudo: true
 
 
@@ -172,6 +188,11 @@
         - ruby-dev
         - gem
       sudo: true
+    - name: Install Gem packages
+      gem: name={{ item }} user_install=no state=latest
+      with_items:
+        - jekyll
+      sudo: true
 
 
     ###
@@ -180,8 +201,17 @@
     - name: Install Node+NPM
       apt: name={{ item }} state=latest
       with_items:
-        - node
+        - nodejs
         - npm
+      sudo: true
+    - name: Install Node packages
+      npm: name={{ item }} global=yes state=latest
+      with_items:
+        - coffee-script
+        - bower
+      sudo: true
+    - name: Add Node to the PATH
+      file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
       sudo: true
 
 
@@ -197,6 +227,18 @@
         - php5-gd
         - php5-curl
         - php-apc
+        - php5-intl
+      sudo: true
+
+
+    ##
+    # Install Composer
+    ##
+    - name: Download composer
+      shell: /usr/bin/curl -s http://getcomposer.org/installer -o /tmp/composer_installer
+      sudo: true
+    - name: Install composer
+      shell: /usr/bin/php /tmp/composer_installer --install-dir=/usr/bin --filename=composer
       sudo: true
 
 
@@ -229,7 +271,6 @@
         - mysql-server
         - php5-mysql
         - python-mysqldb
-    #   - phpmyadmin
       sudo: true
     - name: Add remote connection
       lineinfile: dest=/etc/mysql/my.cnf regexp='^bind-address' line='#bind-address = 127.0.0.1' backup=yes
@@ -249,18 +290,12 @@
     - name: Restart mySQL
       service: name=mysql state=restarted
       sudo: true
-    #- name: Add sql-server config for PHPMyAdmin
-    #  copy: src={{ rootPath }}/skel/etc/apache2/sites-available/sql-server.conf dest=/etc/apache2/sites-available/sql-server.conf owner=root group=root backup=yes
-    #  sudo: true
-    #- name: Enable sql-server for PHPMyAdmin
-    #  shell: a2ensite sql-server
-    #  sudo: true
 
 
     ###
     # Install Postfix
     ###
-    - name: Install mySQL
+    - name: Install postfix
       apt: name=postfix state=latest
       sudo: true
 
@@ -298,7 +333,7 @@
 
 
     ###
-    # Copy skell home with rsync
+    # Copy skell home
     ###
     - name: Add documents/website folder
       file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
@@ -328,6 +363,43 @@
       sudo: true
     - name: Enable website-sample
       shell: a2ensite website-sample
+      sudo: true
+
+
+    ###
+    # Add phpMyAdmin
+    ###
+    - name: Install phpMyAdmin
+      apt: name=phpmyadmin state=latest
+      sudo: true
+    - name: Add phpmyadmin config
+      template: src={{ rootPath }}/skel/etc/apache2/sites-available/phpmyadmin.conf.j2 dest=/etc/apache2/sites-available/phpmyadmin.conf owner=root group=root backup=yes
+      sudo: true
+    - name: Add folder
+      file: path=/home/{{ user }}/documents/website/phpmyadmin/ state=directory
+      sudo: true
+    - name: Add link to www folder
+      file: src=/usr/share/phpmyadmin dest=/home/{{ user }}/documents/website/phpmyadmin/web state=link
+      sudo: true
+    - name: Enable phpmyadmin
+      shell: a2ensite phpmyadmin
+      sudo: true
+
+
+    ###
+    # Add APC Monitoring
+    ###
+    - name: Add APC Monitoring config
+      template: src={{ rootPath }}/skel/etc/apache2/sites-available/apc-monitor.conf.j2 dest=/etc/apache2/sites-available/apc-monitor.conf owner=root group=root backup=yes
+      sudo: true
+    - name: Add folder
+      file: path=/home/{{ user }}/documents/website/apc-monitor/ state=directory
+      sudo: true
+    - name: Add Git repo
+      git: repo=https://github.com/Remiii/apc-monitor.git dest=/home/{{ user }}/documents/website/apc-monitor/
+      sudo: true
+    - name: Enable phpmyadmin
+      shell: a2ensite apc-monitor
       sudo: true
 
 

@@ -6,10 +6,10 @@
     # match this virtual host. For the default virtual host (this file) this
     # value is not decisive as it is used as a last resort host regardless.
     # However, you must set it for any further virtual host explicitly.
-    #ServerName www.example.com
+    ServerName sql.{{ hostname}}
 
     ServerAdmin webmaster@localhost
-    DocumentRoot /home/null/documents/website/sql-server/web
+    DocumentRoot /home/{{ user }}/documents/website/phpmyadmin/web
 
     # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
     # error, crit, alert, emerg.
@@ -17,8 +17,8 @@
     # modules, e.g.
     #LogLevel info ssl:warn
 
-    ErrorLog ${APACHE_LOG_DIR}/sql-server-error.log
-    CustomLog ${APACHE_LOG_DIR}/sql-server-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/phpmyadmin-error.log
+    CustomLog ${APACHE_LOG_DIR}/phpmyadmin-access.log combined
 
     # For most configuration files from conf-available/, which are
     # enabled or disabled at a global level, it is possible to
@@ -27,10 +27,11 @@
     # after it has been globally disabled with "a2disconf".
     #Include conf-available/serve-cgi-bin.conf
 
-    <Directory /home/null/documents/website/sql-server/web>
+    <Directory /home/{{ user }}/documents/website/phpmyadmin/web>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
+        Allow from {{ trustedIp }}
     </Directory>
 
 </VirtualHost>
