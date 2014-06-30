@@ -46,9 +46,9 @@
       sudo: true
 
 
-    ###################
+    ###
     # Time management
-    ###################
+    ###
     - name: Install NTP (and update apt cache for the first install)
       apt: name={{ item }} state=latest
            update_cache=yes
@@ -103,6 +103,20 @@
 
 
     ###
+    # Create SSH user group
+    ###
+    - name: Create group sshuser
+      group: name=sshuser state=present
+      sudo: true
+    - name: Create group sshuserpwd
+      group: name=sshuserpwd state=present
+      sudo: true
+    - name: Create group sshuserkey
+      group: name=sshuserkey state=present
+      sudo: true
+
+
+    ###
     # User Management
     ###
     - name: Add /usr/local/scripts directory
@@ -114,9 +128,6 @@
     - name: Change shell for current user
       shell: chsh -s /bin/zsh
       sudo: true
-    - name: Create group sshuser
-      group: name=sshuser state=present
-      sudo: true
     - name: Create group {{ user }}
       group: name={{ user }} state=present
       sudo: true
@@ -124,7 +135,7 @@
       user: name={{ user }}
             comment="{{ user }} user"
             shell=/bin/zsh
-            groups=sudo,adm,sshuser,{{ user }}
+            groups=sudo,adm,sshuser,sshuserpwd,{{ user }}
       sudo: true
 
 
