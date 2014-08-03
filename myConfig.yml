@@ -99,6 +99,7 @@
         - ifstat
         - build-essential
         - imagemagick
+        - ncdu
       sudo: true
 
 
