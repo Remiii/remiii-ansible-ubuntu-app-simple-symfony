@@ -291,7 +291,7 @@
       mysql_user: name=root password={{ mySqlRootPwd }} priv=*.*:ALL,GRANT state=present check_implicit_admin=yes login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name: Update mysql {{ user }} password for all accounts
-      mysql_user: name={{ user }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }}
+      mysql_user: name={{ mySqlUser }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name : Create DB
       mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
