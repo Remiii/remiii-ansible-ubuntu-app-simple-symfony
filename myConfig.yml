@@ -142,6 +142,7 @@
     - name: Set up authorized_keys for {{ user }}
       authorized_key: user={{ user }}
                       key="{{ lookup('file', 'vars/id_rsa.pub') }}"
+      sudo: true
 
 
     ###
