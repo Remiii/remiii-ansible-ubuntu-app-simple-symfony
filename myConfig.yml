@@ -290,7 +290,7 @@
     - name: Update mysql root password for all root accounts
       mysql_user: name=root password={{ mySqlRootPwd }} priv=*.*:ALL,GRANT state=present check_implicit_admin=yes login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
-    - name: Update mysql {{ user }} password for all accounts
+    - name: Update mysql {{ mySqlUser }} password for all accounts
       mysql_user: name={{ mySqlUser }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name : Create DB
