@@ -98,6 +98,7 @@
         - ncdu
         - ifstat
         - build-essential
+        - openssh-client
         - imagemagick
         - ncdu
       sudo: true
@@ -356,9 +357,6 @@
     - name: Add Apache index file
       template: src={{ rootPath }}/skel/home/myuser/documents/website/website-sample/web/index.php.j2 dest=/home/{{ user }}/documents/website/website-sample/web/index.php
       sudo: true
-    - name: Add login script
-      template: src={{ rootPath }}/skel/usr/local/scripts/loginNotification.sh.j2 dest=/usr/local/scripts/loginNotification.sh owner=root group=root
-      sudo: true
     - name: Clean rights for skell home
       file: path=/home/{{ user }} owner={{ user }} group={{ user }} recurse=yes
       sudo: true
@@ -444,6 +442,12 @@
     - name: Restart proFTPd
       service: name=proftpd state=restarted
       sudo: true
+
+
+    ###
+    # CUSTOM for your Server
+    ###
+    # TBD
 
 
     ###
