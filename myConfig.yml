@@ -139,6 +139,9 @@
             shell=/bin/zsh
             groups=sudo,adm,sshuser,sshuserpwd,{{ user }}
       sudo: true
+    - name: Set up authorized_keys for {{ user }}
+      authorized_key: user={{ user }}
+                      key="{{ lookup('file', 'vars/id_rsa.pub') }}"
 
 
     ###
