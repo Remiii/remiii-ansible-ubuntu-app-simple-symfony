@@ -53,6 +53,15 @@ machine ansible_ssh_host='127.0.0.1' ansible_ssh_port=10022
     ...
 ```
 
+## Add vars
+
+Add the folowing files in the `vars` directory:
+
+- myGitHubUserMachineUserKey
+- myGitHubUserMachineUserKey.pub
+
+... TBD
+
 ## Run
 
 * Ansible

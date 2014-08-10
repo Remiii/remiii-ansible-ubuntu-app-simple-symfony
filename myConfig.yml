@@ -139,6 +139,12 @@
             shell=/bin/zsh
             groups=sudo,adm,sshuser,sshuserpwd,{{ user }}
       sudo: true
+    - name: Add GitHub SSH config for {{ user }}
+      file: path=/home/{{ user }}/.ssh state=directory owner={{ user }} group={{ user }}
+      file: src=./vars/myGitHubUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey owner={{ user }} group={{ user }}
+      file: src=./vars/myGitHubUserMachineUserKey.pub dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey.pub owner={{ user }} group={{ user }}
+      file: src={{ rootPath }}/skel/home/myuser/.ssh/config dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey.pub owner={{ user }} group={{ user }}
+      sudo: true
 
 
     ###
