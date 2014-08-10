@@ -139,6 +139,10 @@
             shell=/bin/zsh
             groups=sudo,adm,sshuser,sshuserpwd,{{ user }}
       sudo: true
+    - name: Set up authorized_keys for {{ user }}
+      authorized_key: user={{ user }}
+                      key="{{ lookup('file', 'vars/mySSHPublicKey.pub') }}"
+      sudo: true
     - name: Add GitHub SSH config for {{ user }}
       file: path=/home/{{ user }}/.ssh state=directory owner={{ user }} group={{ user }}
       file: src=./vars/myGitHubUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey owner={{ user }} group={{ user }}
