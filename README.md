@@ -36,7 +36,7 @@ Install Ansible with your package manager (apt, brew...).
 
 ## Setup
 
-Setup the vars in `myConfig.yml` and add `ansible_inventory_machinename` file.
+Setup the vars in `vars/myConfig.yml` and add `ansible_inventory_machinename` file.
 
 For exemple (is just a sample):
 ```
@@ -44,8 +44,13 @@ For exemple (is just a sample):
 machine ansible_ssh_host='127.0.0.1' ansible_ssh_port=10022
 ```
 
+Copy the config dist file `vars/myConfig.yml.dist`
+```sh
+$ cp vars/myConfig.yml.dist vars/myConfig.yml
 ```
-# pathToTheProject/myConfig.yml
+
+```
+# pathToTheProject/vars/myConfig.yml
     ...
     rootPath: '~/git/remiii-ansible-ubuntu-app-simple-symfony'
     hostname: 'vm1.local'
@@ -59,6 +64,7 @@ Add the folowing files in the `vars` directory:
 
 - myGitHubUserMachineUserKey
 - myGitHubUserMachineUserKey.pub
+- mySSHPublicKey.pub
 
 ... TBD
 

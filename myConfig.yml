@@ -2,29 +2,17 @@
 
 
   ###
-  # Vars
-  ###
-  vars:
-    rootPath: '~/git/project'
-    hostname: 'django.server.mydomain.com'
-    publicIpAddress: '123.123.123.123'
-    trustedIp: '127.0.0.1 192.168.1.10'
-    user: 'django'
-    mySqlSampleUser: 'sqldjango'
-    userPwd: 'azerty'
-    mySqlRootPwd: 'azerty'
-    mySqlUserPwd: 'azerty'
-    mySqlSamplePwd: 'azerty'
-    timezone: 'Europe/Paris'
-    sysadminEmail: 'sysadmin@mydomain.com'
-    ircServer: 'irc.freenode.org'
-    ircChannel: 'mychan'
-
-
-  ###
   # Tasks
   ###
   tasks:
+
+
+    ###
+    # Vars
+    ###
+    - name: Load vars from vars directory
+      include_vars: vars/myConfig.yml
+      sudo: true
 
 
     ###################
@@ -143,11 +131,17 @@
       authorized_key: user={{ user }}
                       key="{{ lookup('file', 'vars/mySSHPublicKey.pub') }}"
       sudo: true
+    - name: Add SSH directory
+      file: path=/home/{{ user }}/.ssh/ state=directory owner={{ user }} group={{ user }} mode=0755
+      sudo: true
+    - name: Add GithHub SSH private key for {{ user }}
+      copy: src={{ rootPath }}/vars/myGitHubUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey owner={{ user }} group={{ user }} mode=0600
+      sudo: true
+    - name: Add GithHub SSH public key for {{ user }}
+      copy: src={{ rootPath }}/vars/myGitHubUserMachineUserKey.pub dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey.pub owner={{ user }} group={{ user }} mode=0644
+      sudo: true
     - name: Add GitHub SSH config for {{ user }}
-      file: path=/home/{{ user }}/.ssh state=directory owner={{ user }} group={{ user }}
-      file: src=./vars/myGitHubUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey owner={{ user }} group={{ user }}
-      file: src=./vars/myGitHubUserMachineUserKey.pub dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey.pub owner={{ user }} group={{ user }}
-      file: src={{ rootPath }}/skel/home/myuser/.ssh/config dest=/home/{{ user }}/.ssh/myGitHubMachineUserKey.pub owner={{ user }} group={{ user }}
+      copy: src={{ rootPath }}/skel/home/myuser/.ssh/config dest=/home/{{ user }}/.ssh/config owner={{ user }} group={{ user }} mode=0644 backup=yes
       sudo: true
 
 

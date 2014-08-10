@@ -1,0 +1,18 @@
+###
+# myConfig
+###
+rootPath: '~/git/project'
+hostname: 'django.server.mydomain.com'
+publicIpAddress: '123.123.123.123'
+trustedIp: '127.0.0.1 192.168.1.10'
+user: 'django'
+mySqlUser: 'sqldjango'
+mySqlSampleUser: 'sqlsamplewebsite'
+userPwd: 'azerty'
+mySqlRootPwd: 'azerty'
+mySqlUserPwd: 'azerty'
+mySqlSamplePwd: 'azerty'
+timezone: 'Europe/Paris'
+sysadminEmail: 'sysadmin@mydomain.com'
+ircServer: 'irc.freenode.org'
+ircChannel: 'mychan'
