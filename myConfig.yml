@@ -89,6 +89,7 @@
         - openssh-client
         - imagemagick
         - ncdu
+        - tree
       sudo: true
 
 
