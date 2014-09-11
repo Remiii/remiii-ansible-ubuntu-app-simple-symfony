@@ -329,9 +329,9 @@
     ###
     # Install FTP ^^ (no prod EVT!!!)
     ###
-    - name: Install proftpd
-      apt: name=proftpd state=latest
-      sudo: true
+    #- name: Install proftpd
+    #  apt: name=proftpd state=latest
+    #  sudo: true
     #- name: Create ftpgroup
     #  group: name=ftpgroup-{{ user }} state=present
     #  sudo: true
@@ -342,12 +342,12 @@
     #  with_items:
     #    - ftpgroup-{{ user }}
     #  sudo: true
-    - name: Add proftpd conf
-      template: src={{ rootPath }}/skel/etc/proftpd/proftpd.conf.j2 dest=/etc/proftpd/proftpd.conf owner=root group=root backup=yes
-      sudo: true
-    - name: Restart proFTPd
-      service: name=proftpd state=restarted
-      sudo: true
+    #- name: Add proftpd conf
+    #  template: src={{ rootPath }}/skel/etc/proftpd/proftpd.conf.j2 dest=/etc/proftpd/proftpd.conf owner=root group=root backup=yes
+    #  sudo: true
+    #- name: Restart proFTPd
+    #  service: name=proftpd state=restarted
+    #  sudo: true
 
 
     ###
