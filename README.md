@@ -62,8 +62,8 @@ $ cp vars/myConfig.yml.dist vars/myConfig.yml
 
 Add the folowing files in the `vars` directory:
 
-- myGitHubUserMachineUserKey
-- myGitHubUserMachineUserKey.pub
+- myGitHubUserMachineUserKey - (Some info about GitHub UserMachine)[https://developer.github.com/guides/managing-deploy-keys/#machine-users]
+- myGitHubUserMachineUserKey.pub - (Some info about GitHub UserMachine)[https://developer.github.com/guides/managing-deploy-keys/#machine-users]
 - mySSHPublicKey.pub
 
 ... TBD
