@@ -419,11 +419,22 @@
 
 
     ###
-    # Apache2 config
+    # PHP config (CLI + Apache2)
     ###
-    - name: Apache2 php config
+    - name: PHP Apache2 config for TimeZone
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;date.timezone' line='date.timezone = Europe/Paris' backup=yes
+      sudo: true
+    - name: PHP CLI config for TimeZone
+      lineinfile: dest=/etc/php5/cli/php.ini regexp='^;date.timezone' line='date.timezone = Europe/Paris' backup=yes
+      sudo: true
+    - name: PHP Apache2 config for Memory
       lineinfile: dest=/etc/php5/apache2/php.ini regexp='^memory_limit = 128M' line='memory_limit = 256M' backup=yes
       sudo: true
+
+
+    ###
+    # Apache2 config
+    ###
     - name: Apache2 module
       apache2_module: state=present name={{ item }}
       with_items:
