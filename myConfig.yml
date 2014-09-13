@@ -51,6 +51,9 @@
     - name: Start the ntp service
       service: name=ntp state=started enabled=true
       sudo: true
+    - name: Update time
+      command: dpkg-reconfigure --frontend noninteractive tzdata
+      sudo: true
 
 
     ###
