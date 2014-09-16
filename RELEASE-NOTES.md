@@ -1,5 +1,14 @@
 #RELEASE-NOTES
 
+## v0.1.1 - 2014/08/16
+
+* TimeZone bugfix
+* TimeZone conf for PHP
+* Securtiy config for Apache (APC and SQL) bugfix
+* GitHubUserMachineUserKey bugfix
+* Add tree
+* Bugfixes
+
 ## v0.1.0 - 2014/08/10
 
 * Add Authorized key
