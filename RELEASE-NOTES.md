@@ -1,6 +1,12 @@
 #RELEASE-NOTES
 
-## v0.1.1 - 2014/08/16
+## v0.1.2 - 2014/09/17
+
+* Update website-sample with hostname welcome page
+* Security update for mySQL
+* Bugfix FTP remove
+
+## v0.1.1 - 2014/09/16
 
 * TimeZone bugfix
 * TimeZone conf for PHP

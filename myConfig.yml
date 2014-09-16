@@ -297,16 +297,25 @@
       lineinfile: dest=/etc/mysql/my.cnf regexp='^bind-address' line='#bind-address = 127.0.0.1' backup=yes
       sudo: true
     - name: Update mysql root password for all root accounts
-      mysql_user: name=root password={{ mySqlRootPwd }} priv=*.*:ALL,GRANT state=present check_implicit_admin=yes login_user=root login_password={{ mySqlRootPwd }}
+      mysql_user: name=root password={{ mySqlRootPwd }} priv=*.*:ALL,GRANT host={{ item }} state=present check_implicit_admin=yes login_user=root login_password={{ mySqlRootPwd }}
+      with_items:
+        - "{{ hostname }}"
+        - 127.0.0.1
+        - ::1
+        - localhost
       sudo: true
+      # 'localhost' needs to be the last item for idempotency, see http://docs.ansible.com/mysql_user_module.html
     - name: Update mysql {{ mySqlUser }} password for all accounts
-      mysql_user: name={{ mySqlUser }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }}
+      mysql_user: name={{ mySqlUser }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
       sudo: true
     - name : Create DB
       mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name: Update mysql website-sample password
       mysql_user: name={{ mySqlSampleUser }} password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
+      sudo: true
+    - name: Ensure mysql anonymous users are not in the database
+      mysql_user: name='' state=absent login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
     - name: Restart mySQL
       service: name=mysql state=restarted
@@ -458,9 +467,9 @@
     - name: Restart mySQL
       service: name=mysql state=restarted
       sudo: true
-    - name: Restart proFTPd
-      service: name=proftpd state=restarted
-      sudo: true
+    #- name: Restart proFTPd
+    #  service: name=proftpd state=restarted
+    #  sudo: true
 
 
     ###
