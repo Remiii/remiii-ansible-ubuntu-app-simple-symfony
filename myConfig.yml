@@ -157,6 +157,9 @@
       with_items:
         - fail2ban
       sudo: true
+    - name: Add Fail2ban conf
+      template: src={{ rootPath }}/skel/etc/fail2ban/jail.local.j2 dest=/etc/fail2ban/jail.local owner=root group=root backup=yes
+      sudo: true
     - name: Disable Root login (useless on Ubuntu but just in case ;-)
       lineinfile: dest=/etc/ssh/sshd_config regexp='^PermitRootLogin' line='PermitRootLogin no' backup=yes
       sudo: true
@@ -466,6 +469,9 @@
       sudo: true
     - name: Restart mySQL
       service: name=mysql state=restarted
+      sudo: true
+    - name: Restart Fail2ban
+      service: name=fail2ban state=restarted
       sudo: true
     #- name: Restart proFTPd
     #  service: name=proftpd state=restarted
