@@ -250,7 +250,6 @@
         - php5-dev
         - php5-gd
         - php5-curl
-        - php-apc
         - php5-intl
       sudo: true
 
@@ -417,23 +416,6 @@
 
 
     ###
-    # Add APC Monitoring
-    ###
-    - name: Add APC Monitoring config
-      template: src={{ rootPath }}/skel/etc/apache2/sites-available/apc-monitor.conf.j2 dest=/etc/apache2/sites-available/apc-monitor.conf owner=root group=root backup=yes
-      sudo: true
-    - name: Add folder
-      file: path=/home/{{ user }}/documents/website/apc-monitor/ state=directory
-      sudo: true
-    - name: Add Git repo
-      git: repo=https://github.com/Remiii/apc-monitor.git dest=/home/{{ user }}/documents/website/apc-monitor/
-      sudo: true
-    - name: Enable phpmyadmin
-      shell: a2ensite apc-monitor
-      sudo: true
-
-
-    ###
     # PHP config (CLI + Apache2)
     ###
     - name: PHP Apache2 config for TimeZone
@@ -445,6 +427,18 @@
     - name: PHP Apache2 config for Memory
       lineinfile: dest=/etc/php5/apache2/php.ini regexp='^memory_limit = 128M' line='memory_limit = 256M' backup=yes
       sudo: true
+    - name: PHP Apache2 enable opCache
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;opcache.enable=0' line='opcache.enable=1' backup=yes
+      sudo: true
+    - name: PHP Apache2 config memory for opCache
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;opcache.memory_consumption=64' line='opcache.memory_consumption=128' backup=yes
+      sudo: true
+    - name: PHP Apache2 config memory for opCache
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;opcache.max_accelerated_files=2000' line='opcache.max_accelerated_files=4000' backup=yes
+      sudo: true
+    #- name: PHP Apache2 config memory for opCache
+    #  lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;opcache_revalidate_freq = 2' line='opcache_revalidate_freq = 5' backup=yes
+    #  sudo: true
 
 
     ###
