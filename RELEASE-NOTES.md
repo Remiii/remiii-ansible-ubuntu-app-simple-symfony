@@ -1,5 +1,9 @@
 #RELEASE-NOTES
 
+## v0.1.5 - 2015/09/09
+
+* Add APCu
+
 ## v0.1.4 - 2015/09/09
 
 * Remove APC and add opCache

@@ -251,6 +251,7 @@
         - php5-gd
         - php5-curl
         - php5-intl
+        - php5-apcu
       sudo: true
 
 
