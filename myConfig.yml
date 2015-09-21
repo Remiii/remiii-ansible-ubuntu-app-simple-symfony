@@ -419,6 +419,9 @@
     ###
     # PHP config (CLI + Apache2)
     ###
+    - name: PHP Apache2 config unexpose php version
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^expose_php = On' line='expose_php = Off' backup=yes
+      sudo: true
     - name: PHP Apache2 config for TimeZone
       lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;date.timezone' line='date.timezone = Europe/Paris' backup=yes
       sudo: true
