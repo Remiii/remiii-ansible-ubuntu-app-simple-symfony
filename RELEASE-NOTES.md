@@ -1,5 +1,12 @@
 #RELEASE-NOTES
 
+## v0.1.6 - 2015/09/26
+
+* Remove PHP version display
+* Add skel folders
+* Add defaultUser config
+* Update upload file config
+
 ## v0.1.5 - 2015/09/09
 
 * Add APCu

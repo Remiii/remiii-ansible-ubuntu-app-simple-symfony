@@ -82,6 +82,12 @@ Sample command line for Vagrant:
 $ ansible-playbook -i ansible_inventory_machinename --private-key=~/.vagrant.d/insecure_private_key -u vagrant ./myConfig.yml
 ```
 
+Sample command line for Scaleway/OVH...:
+
+```
+$ ansible-playbook -i ansible_inventory_machinename --private-key=~/.ssh/my-private-key.pem -u root ./myConfig.yml
+```
+
 Sample command line for AmazonEC2:
 
 ```

@@ -160,17 +160,17 @@
     - name: Add Fail2ban conf
       template: src={{ rootPath }}/skel/etc/fail2ban/jail.local.j2 dest=/etc/fail2ban/jail.local owner=root group=root backup=yes
       sudo: true
-    - name: Disable Root login (useless on Ubuntu but just in case ;-)
-      lineinfile: dest=/etc/ssh/sshd_config regexp='^PermitRootLogin' line='PermitRootLogin no' backup=yes
-      sudo: true
+    #- name: Disable Root login (useless on Ubuntu but just in case ;-)
+    #  lineinfile: dest=/etc/ssh/sshd_config regexp='^PermitRootLogin' line='PermitRootLogin no' backup=yes
+    #  sudo: true
     - name: Some security optim
       lineinfile: dest=/etc/ssh/sshd_config line="Match User {{ user }}" backup=yes
       sudo: true
     - name: Some security optim
-      lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication yes" backup=yes
+      lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
       sudo: true
     - name: Some security optim
-      lineinfile: dest=/etc/ssh/sshd_config line="Match User ubuntu" backup=yes
+      lineinfile: dest=/etc/ssh/sshd_config line="Match User {{ defaultUser }}" backup=yes
       sudo: true
     - name: Some security optim
       lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
@@ -369,10 +369,19 @@
     # Copy skell home
     ###
     - name: Add documents/website folder
-      file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
+      file: path=/home/{{ user }}/documents/website/ state=directory
+      sudo: true
+    - name: Add tmp folder
+      file: path=/home/{{ user }}/tmp/ state=directory
+      sudo: true
+    - name: Add documents/backup folder
+      file: path=/home/{{ user }}/documents/backup/ state=directory
       sudo: true
     - name: Add README.md file
       template: src={{ rootPath }}/skel/home/myuser/README.md.j2 dest=/home/{{ user }}/README.md
+      sudo: true
+    - name: Add documents/website/website-sample/web/ folder
+      file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
       sudo: true
     - name: Add Apache index file
       template: src={{ rootPath }}/skel/home/myuser/documents/website/website-sample/web/index.php.j2 dest=/home/{{ user }}/documents/website/website-sample/web/index.php
@@ -430,6 +439,12 @@
       sudo: true
     - name: PHP Apache2 config for Memory
       lineinfile: dest=/etc/php5/apache2/php.ini regexp='^memory_limit = 128M' line='memory_limit = 256M' backup=yes
+      sudo: true
+    - name: PHP Apache2 config for max upload file size
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^upload_max_filesize = 2M' line='upload_max_filesize = 128M' backup=yes
+      sudo: true
+    - name: PHP Apache2 config for max upload file size
+      lineinfile: dest=/etc/php5/apache2/php.ini regexp='^post_max_size = 8M' line='post_max_size = 128M' backup=yes
       sudo: true
     - name: PHP Apache2 enable opCache
       lineinfile: dest=/etc/php5/apache2/php.ini regexp='^;opcache.enable=0' line='opcache.enable=1' backup=yes
