@@ -1,6 +1,6 @@
 # Ansible configuration<br>Simple Symfony Application
 
-This ansible config is just a sample, do not use in production!
+This ansible config is just a sample, do not use in production!!! More security improvment needs to be done for production (eg. iptables...).
 
 ```
                    ___,                 _    _       ___               _
@@ -20,7 +20,7 @@ Ansible.
 Ubuntu server 14.04.
 
 Users system:
-- ubuntu or vargrant... (sudo) default user
+- ubuntu, vargrant or root... (sudo) default user
 - $user (sudo)
 
 Users mySQL:

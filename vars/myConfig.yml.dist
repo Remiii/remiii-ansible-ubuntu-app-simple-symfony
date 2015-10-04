@@ -4,7 +4,7 @@
 rootPath: '~/git/project'
 hostname: 'django.server.mydomain.com'
 publicIpAddress: '123.123.123.123'
-trustedIp: '127.0.0.1 192.168.1.10'
+trustedIp: '127.0.0.1 123.123.123.123 192.168.1.10'
 defaultUser: 'ubuntu'
 user: 'django'
 mySqlUser: 'sqldjango'
@@ -15,5 +15,38 @@ mySqlUserPwd: 'azerty'
 mySqlSamplePwd: 'azerty'
 timezone: 'Europe/Paris'
 sysadminEmail: 'sysadmin@mydomain.com'
+gitName: YourGitusername
+gitEmail: email@email.com
 ircServer: 'irc.freenode.org'
 ircChannel: 'mychan'
+apacheVhosts:
+  -
+    name: 'remiii-website-foo'
+    git: 'git@github.com:Remiii/remiii-website-foo.git'
+    serverName: 'foo.com'
+    serverAlias: ''
+    serverAdmin: 'sysadmin@foo.com'
+    webFolder: 'web'
+    shell: "
+        export SYMFONY_ENV=prod;
+        composer install --no-dev --optimize-autoloader --no-ansi --no-interaction --no-progress"
+    shellSudo: "
+        HTTPDUSER=www-data;
+        setfacl -R -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs;
+        setfacl -dR -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs"
+  -
+    name: 'remiii-website-kiter'
+    git: 'git@github.com:Remiii/remiii-website-kiter.git'
+    serverName: 'kiter.io'
+    serverAlias: 'www.kiter.io'
+    serverAdmin: 'sysadmin@mydomain.com'
+    webFolder: 'web'
+    shell: "
+        git checkout -b production origin/production;
+        git branch -D development;
+        export SYMFONY_ENV=prod;"
+    shellSudo: "
+        HTTPDUSER=www-data;
+        setfacl -R -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs;
+        setfacl -dR -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs"
+

@@ -91,7 +91,6 @@
         - build-essential
         - openssh-client
         - imagemagick
-        - ncdu
         - tree
       sudo: true
 
@@ -119,6 +118,9 @@
     - name: Add login script
       template: src={{ rootPath }}/skel/usr/local/scripts/loginNotification.sh.j2 dest=/usr/local/scripts/loginNotification.sh owner=root group=root
       sudo: true
+    - name: Add login script for root account
+      lineinfile: dest=/root/.bashrc line="/usr/local/scripts/loginNotification.sh" backup=yes
+      sudo: true
     - name: Change shell for current user
       shell: chsh -s /bin/zsh
       sudo: true
@@ -138,14 +140,20 @@
     - name: Add SSH directory
       file: path=/home/{{ user }}/.ssh/ state=directory owner={{ user }} group={{ user }} mode=0755
       sudo: true
-    - name: Add GithHub SSH private key for {{ user }}
-      copy: src={{ rootPath }}/vars/myGitHubUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitHubUserMachineUserKey owner={{ user }} group={{ user }} mode=0600
+    - name: Add GitHub SSH private key for {{ user }}
+      copy: src={{ rootPath }}/vars/myGitUserMachineUserKey dest=/home/{{ user }}/.ssh/myGitUserMachineUserKey owner={{ user }} group={{ user }} mode=0600
       sudo: true
-    - name: Add GithHub SSH public key for {{ user }}
-      copy: src={{ rootPath }}/vars/myGitHubUserMachineUserKey.pub dest=/home/{{ user }}/.ssh/myGitHubUserMachineUserKey.pub owner={{ user }} group={{ user }} mode=0644
+    - name: Add GitHub SSH public key for {{ user }}
+      copy: src={{ rootPath }}/vars/myGitUserMachineUserKey.pub dest=/home/{{ user }}/.ssh/myGitUserMachineUserKey.pub owner={{ user }} group={{ user }} mode=0644
       sudo: true
     - name: Add GitHub SSH config for {{ user }}
       copy: src={{ rootPath }}/skel/home/myuser/.ssh/config dest=/home/{{ user }}/.ssh/config owner={{ user }} group={{ user }} mode=0644 backup=yes
+      sudo: true
+    - name: Add github to ssh known hosts
+      shell: ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts
+      sudo: true
+    - name: Add bitbucket.org to ssh known hosts
+      shell: ssh-keyscan -H bitbucket.org >> /etc/ssh/ssh_known_hosts
       sudo: true
 
 
@@ -169,12 +177,12 @@
     - name: Some security optim
       lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
       sudo: true
-    - name: Some security optim
-      lineinfile: dest=/etc/ssh/sshd_config line="Match User {{ defaultUser }}" backup=yes
-      sudo: true
-    - name: Some security optim
-      lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
-      sudo: true
+    #- name: Some security optim
+    #  lineinfile: dest=/etc/ssh/sshd_config line="Match User {{ defaultUser }}" backup=yes
+    #  sudo: true
+    #- name: Some security optim
+    #  lineinfile: dest=/etc/ssh/sshd_config line="    PasswordAuthentication no" backup=yes
+    #  sudo: true
     - name: Restart SSHd
       service: name=ssh state=reloaded
       sudo: true
@@ -199,6 +207,11 @@
       with_items:
         - python
         - python-pip
+      sudo: true
+    - name: Install Gem packages
+      pip: name={{ item }} state=latest
+      with_items:
+        - awscli
       sudo: true
 
 
@@ -233,6 +246,8 @@
       with_items:
         - coffee-script
         - bower
+        - uglify-js
+        - uglifycss
       sudo: true
     - name: Add Node to the PATH
       file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
@@ -252,6 +267,7 @@
         - php5-curl
         - php5-intl
         - php5-apcu
+        - php5-sqlite
       sudo: true
 
 
@@ -311,15 +327,19 @@
     - name: Update mysql {{ mySqlUser }} password for all accounts
       mysql_user: name={{ mySqlUser }} password={{ mySqlUserPwd }} priv=*.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
       sudo: true
-    - name : Create DB
-      mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
-      sudo: true
-    - name: Update mysql website-sample password
-      mysql_user: name={{ mySqlSampleUser }} password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
-      sudo: true
+    #- name : Create DB
+    #  mysql_db: name=website-sample state=present login_user=root login_password={{ mySqlRootPwd }}
+    #  sudo: true
+    #- name: Update mysql website-sample password
+    #  mysql_user: name={{ mySqlSampleUser }} password={{ mySqlSamplePwd }} priv=website-sample.*:ALL state=present login_user=root login_password={{ mySqlRootPwd }} host=%
+    #  sudo: true
     - name: Ensure mysql anonymous users are not in the database
       mysql_user: name='' state=absent login_user=root login_password={{ mySqlRootPwd }}
       sudo: true
+    - name: Disable mySQL public port
+      lineinfile: dest=/etc/mysql/my.cnf regexp='^#bind-address = 127.0.0.1' line='bind-address = 127.0.0.1' backup=yes
+      sudo: true
+
     - name: Restart mySQL
       service: name=mysql state=restarted
       sudo: true
@@ -368,41 +388,83 @@
     ###
     # Copy skell home
     ###
+    - name: Add gitconfig
+      template: src={{ rootPath }}/skel/home/myuser/.gitconfig.j2 dest=/home/{{ user }}/.gitconfig
+      become: yes
+      become_user: "{{ user }}"
     - name: Add documents/website folder
       file: path=/home/{{ user }}/documents/website/ state=directory
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
     - name: Add tmp folder
       file: path=/home/{{ user }}/tmp/ state=directory
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
     - name: Add documents/backup folder
       file: path=/home/{{ user }}/documents/backup/ state=directory
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
     - name: Add README.md file
       template: src={{ rootPath }}/skel/home/myuser/README.md.j2 dest=/home/{{ user }}/README.md
-      sudo: true
-    - name: Add documents/website/website-sample/web/ folder
-      file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
-      sudo: true
-    - name: Add Apache index file
-      template: src={{ rootPath }}/skel/home/myuser/documents/website/website-sample/web/index.php.j2 dest=/home/{{ user }}/documents/website/website-sample/web/index.php
-      sudo: true
-    - name: Clean rights for skell home
-      file: path=/home/{{ user }} owner={{ user }} group={{ user }} recurse=yes
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
+    #- name: Add documents/website/website-sample/web/ folder
+    #  file: path=/home/{{ user }}/documents/website/website-sample/web/ state=directory
+    #  become: yes
+    #  become_user: "{{ user }}"
+    #- name: Add Apache index file
+    #  template: src={{ rootPath }}/skel/home/myuser/documents/website/website-sample/web/index.php.j2 dest=/home/{{ user }}/documents/website/website-sample/web/index.php
+    #  become: yes
+    #  become_user: "{{ user }}"
 
 
     ###
-    # Enable website-sample
+    # Base config Apache vHost (default, website-sample)
     ###
     - name: Disable default
       shell: a2dissite 000-default
       sudo: true
-    - name: Add website-sample config
-      template: src={{ rootPath }}/skel/etc/apache2/sites-available/website-sample.conf.j2 dest=/etc/apache2/sites-available/website-sample.conf owner=root group=root backup=yes
+    #- name: Add website-sample config
+    #  template: src={{ rootPath }}/skel/etc/apache2/sites-available/website-sample.conf.j2 dest=/etc/apache2/sites-available/website-sample.conf owner=root group=root backup=yes
+    #  sudo: true
+    #- name: Enable website-sample
+    #  shell: a2ensite website-sample
+    #  sudo: true
+
+
+    ###
+    # Add Apache vHost
+    ###
+    - name: Git clone {{ item.name }}
+      git:
+        repo={{ item.git }} dest=/home/{{ user }}/documents/website/{{ item.name }}
+        key_file=/home/{{ user }}/.ssh/myGitUserMachineUserKey
+        accept_hostkey=yes
+      become: yes
+      become_user: "{{ user }}"
+      with_items: "{{ apacheVhosts }}"
+    - name: Exec cmd {{ item.user }}
+      shell: "{{ item.shell }}"
+      args:
+        chdir: /home/{{ user }}/documents/website/{{ item.name }}
+      become: yes
+      become_user: "{{ user }}"
+      with_items: "{{ apacheVhosts }}"
+    - name: Exec cmd {{ sudo }}
+      shell: "{{ item.shellSudo }}"
+      args:
+        chdir: /home/{{ user }}/documents/website/{{ item.name }}
+      with_items: "{{ apacheVhosts }}"
       sudo: true
-    - name: Enable website-sample
-      shell: a2ensite website-sample
+    - name: Setup Apache vHosts
+      template: src={{ rootPath }}/skel/etc/apache2/sites-available/vhosts-sample.conf.j2 dest=/etc/apache2/sites-available/{{ item.name }}.conf owner=root group=root backup=yes
+      with_items: "{{ apacheVhosts }}"
       sudo: true
+    - name: Enable Apache vHost
+      shell: a2ensite {{ item.name }}
+      with_items: "{{ apacheVhosts }}"
+      sudo: true
+
 
 
     ###
@@ -416,10 +478,14 @@
       sudo: true
     - name: Add folder
       file: path=/home/{{ user }}/documents/website/phpmyadmin/ state=directory
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
+      #sudo: true
     - name: Add link to www folder
       file: src=/usr/share/phpmyadmin dest=/home/{{ user }}/documents/website/phpmyadmin/web state=link
-      sudo: true
+      become: yes
+      become_user: "{{ user }}"
+      #sudo: true
     - name: Enable phpmyadmin
       shell: a2ensite phpmyadmin
       sudo: true

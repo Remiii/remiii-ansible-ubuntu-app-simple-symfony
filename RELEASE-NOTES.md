@@ -1,5 +1,10 @@
 #RELEASE-NOTES
 
+## v0.2.0 - 2015/10/01
+
+* Add vHost generator
+* ...
+
 ## v0.1.6 - 2015/09/26
 
 * Remove PHP version display
