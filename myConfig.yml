@@ -1,6 +1,5 @@
 - hosts: all
 
-
   ###
   # Tasks
   ###
@@ -160,7 +159,17 @@
     ###
     # Security Tools
     ###
-    - name: Install Security tools
+    - name: Install Iptables
+      apt: name=iptables state=latest
+      sudo: true
+    - name: Exec cmd {{ sudo }}
+      shell: "{{ item.rule }}"
+      with_items: "{{ securityRules }}"
+      sudo: true
+    - name: Install Iptables-persistent
+      apt: name=iptables-persistent state=latest
+      sudo: true
+    - name: Install Fail2ban
       apt: name={{ item }} state=latest
       with_items:
         - fail2ban
@@ -489,6 +498,10 @@
     - name: Enable phpmyadmin
       shell: a2ensite phpmyadmin
       sudo: true
+    # TODO Manually
+    #- name: Reconfig phpmyadmin
+    #  shell: dpkg-reconfigure phpmyadmin
+    #  sudo: true
 
 
     ###
@@ -534,6 +547,15 @@
       with_items:
         - headers
         - rewrite
+      sudo: true
+
+
+    ###
+    # Cron service
+    ###
+    - name: Add cron
+      cron: name="{{ item.name }}" minute="{{ item.minute }}" hour="{{ item.hour }}" job="{{ item.job }}" user="{{ item.user }}" backup=yes
+      with_items: "{{ cronJobs }}"
       sudo: true
 
 

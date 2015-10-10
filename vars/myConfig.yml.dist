@@ -19,6 +19,17 @@ gitName: YourGitusername
 gitEmail: email@email.com
 ircServer: 'irc.freenode.org'
 ircChannel: 'mychan'
+securityRules:
+ -
+    rule: 'sudo iptables -F'
+ -
+    rule: 'iptables -I INPUT 1 -i lo -j ACCEPT'
+ -
+    rule: 'iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT'
+ -
+    rule: 'iptables -A INPUT -p tcp --dport 22 -j ACCEPT'
+ -
+    rule: 'iptables -A INPUT -j DROP'
 apacheVhosts:
   -
     name: 'remiii-website-foo'
@@ -49,4 +60,16 @@ apacheVhosts:
         HTTPDUSER=www-data;
         setfacl -R -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs;
         setfacl -dR -m u:\"$HTTPDUSER\":rwX -m u:`whoami`:rwX app/cache app/logs"
-
+cronJobs:
+  -
+    name: 'Cron #1'
+    minute: '35'
+    hour: '6,7'
+    job: 'php5 /foo/bar'
+    user: 'django'
+  -
+    name: 'Cron #2'
+    minute: '55'
+    hour: '20'
+    job: 'php5 /foo/bar'
+    user: 'django'

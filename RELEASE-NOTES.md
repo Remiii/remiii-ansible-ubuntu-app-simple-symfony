@@ -1,5 +1,10 @@
 #RELEASE-NOTES
 
+## v0.2.1 - 2015/10/10
+
+* Add cron job
+* Add iptables rules
+
 ## v0.2.0 - 2015/10/01
 
 * Add vHost generator
