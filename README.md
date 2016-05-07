@@ -41,7 +41,13 @@ Setup the vars in `vars/myConfig.yml` and add `ansible_inventory_machinename.yml
 For exemple (is just a sample):
 ```
 # ansible_inventory_machinename.yml
-machineName ansible_user='myConnexionUser' ansible_host='127.0.0.1' ansible_port=10022 ansible_ssh_private_key_file='~/.ssh/myPrivateKey.pem'
+machineName ansible_host='127.0.0.1' ansible_port=10022 ansible_user='myConnexionUser' ansible_ssh_private_key_file='~/.ssh/myPrivateKey.pem'
+#Sample command line for Vagrant:
+machineName ansible_host='127.0.0.1' ansible_port=20022 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
+# Sample command line for Scaleway/OVH...:
+machineName ansible_host='127.0.0.1' ansible_port=30022 ansible_user='root' ansible_ssh_private_key_file='~/.ssh/my-private-key.pem'
+# Sample command line for AmazonEC2:
+machineName ansible_host='127.0.0.1' ansible_port=40022 ansible_user='ubuntu' ansible_ssh_private_key_file='~/.ssh/my-private-key.pem'
 ```
 
 Copy the config dist file `vars/myConfig.yml.dist`
