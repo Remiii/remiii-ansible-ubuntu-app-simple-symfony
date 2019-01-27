@@ -91,6 +91,7 @@
         - openssh-client
         - imagemagick
         - tree
+        - unzip
       sudo: true
 
 
